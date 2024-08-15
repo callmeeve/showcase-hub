@@ -17,7 +17,7 @@ export default function Home() {
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/projects`);
+        const res = await fetch("/api/projects");
         if (!res.ok) {
           throw new Error(`Failed to fetch projects: ${res.statusText}`);
         }
