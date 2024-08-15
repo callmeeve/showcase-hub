@@ -14,7 +14,7 @@ const Admin = () => {
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const res = await fetch(process.env.NEXT_PUBLIC_API_URL + "/projects");
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/projects`);
         if (!res.ok) {
           throw new Error(`Failed to fetch projects: ${res.statusText}`);
         }
