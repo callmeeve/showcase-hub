@@ -42,7 +42,7 @@ export default function Register() {
         formData.append("avatar", avatar);
       }
 
-      const res = await fetch("/api/auth/signup", {
+      const res = await fetch(process.env.NEXT_PUBLIC_API_URL + "/auth/signup", {
         method: "POST",
         body: formData,
       });

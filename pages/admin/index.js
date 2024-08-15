@@ -14,7 +14,7 @@ const Admin = () => {
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const res = await fetch("/api/projects");
+        const res = await fetch(process.env.NEXT_PUBLIC_API_URL + "/projects");
         if (!res.ok) {
           throw new Error(`Failed to fetch projects: ${res.statusText}`);
         }
@@ -40,7 +40,7 @@ const Admin = () => {
     formData.append("url", newProject.url);
 
     try {
-      const res = await fetch("/api/projects", {
+      const res = await fetch(process.env.NEXT_PUBLIC_API_URL + "/projects", {
         method: "POST",
         body: formData,
       });
