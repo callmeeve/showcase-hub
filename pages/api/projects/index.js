@@ -2,7 +2,8 @@
 import { getSession } from "next-auth/react";
 import prisma from "@/lib/prisma";
 import multer from "multer";
-import path from "path";
+import cloudinary from "@/lib/cloudinary";
+import streamifier from "streamifier";
 
 // Increase the body size limit
 export const config = {
@@ -13,14 +14,7 @@ export const config = {
 
 // Configure multer for file uploads
 const upload = multer({
-  storage: multer.diskStorage({
-    destination: (req, file, cb) => {
-      cb(null, path.join(process.cwd(), "public/uploads"));
-    },
-    filename: (req, file, cb) => {
-      cb(null, `${Date.now()}-${file.originalname}`);
-    },
-  }),
+  storage: multer.memoryStorage(), // Use memory storage
   limits: { fileSize: 10 * 1024 * 1024 }, // Set the file size limit to 10MB
 }).single("image");
 
@@ -71,6 +65,29 @@ export default async function handler(req, res) {
           return res.status(400).json({ message: "Name and URL are required" });
         }
 
+        let imageUrl;
+        if (req.file) {
+          try {
+            const streamUpload = (req) => {
+              return new Promise((resolve, reject) => {
+                const stream = cloudinary.uploader.upload_stream((error, result) => {
+                  if (result) {
+                    resolve(result);
+                  } else {
+                    reject(error);
+                  }
+                });
+                streamifier.createReadStream(req.file.buffer).pipe(stream);
+              });
+            };
+            const result = await streamUpload(req);
+            imageUrl = result.secure_url;
+          } catch (error) {
+            console.error("Error uploading to Cloudinary:", error);
+            return res.status(500).json({ message: "Error uploading image" });
+          }
+        }
+
         try {
           const project = await prisma.project.create({
             data: {
@@ -78,7 +95,7 @@ export default async function handler(req, res) {
               description,
               url,
               userId: session.user.id,
-              image: req.file ? `/uploads/${req.file.filename}` : undefined,
+              image: imageUrl,
             },
           });
           res.status(201).json(project);

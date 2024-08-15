@@ -129,6 +129,11 @@ export default function Home() {
                 <p className="text-red-500">{error}</p>
               </div>
             )}
+            {filteredProjects.length === 0 && !loading && (
+              <div className="flex items-center justify-center col-span-3">
+                <p className="text-gray-600">No projects found</p>
+              </div>
+            )}
             {filteredProjects.map((project) => (
               <ProjectCard key={project.id} project={project} />
             ))}
