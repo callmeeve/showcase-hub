@@ -2,6 +2,7 @@ import AdminLayout from "@/components/AdminLayout";
 import ProjectCard from "@/components/ProjectCard";
 import ProjectDialogForm from "@/components/ProjectDialogForm";
 import { useState, useEffect } from "react";
+import { InfinitySpin } from "react-loader-spinner";
 
 const Admin = () => {
   const [projects, setProjects] = useState([]);
@@ -52,7 +53,7 @@ const Admin = () => {
   return (
     <AdminLayout>
       {loading ? (
-        <div>Loading...</div>
+        <InfinitySpin color="#06b6d4" size={50} />
       ) : error ? (
         <div style={{ color: "red" }}>{error}</div>
       ) : projects.length === 0 ? (
