@@ -53,33 +53,31 @@ export default async function handler(req, res) {
         }
       }
 
-      if (!name || !email || !password) {
-        return res
-          .status(400)
-          .json({ error: "Name, email, and password are required" });
+      try {
+        // Check if the email already exists
+        const existingUser = await prisma.user.findUnique({
+          where: { email },
+        });
+
+        if (existingUser) {
+          return res.status(400).json({ message: "Email already in use" });
+        }
+
+        const hashedPassword = await hash(password, 10);
+        const newUser = await prisma.user.create({
+          data: {
+            name,
+            email,
+            password: hashedPassword,
+            avatar: imageUrl,
+          },
+        });
+
+        res.status(201).json(newUser);
+      } catch (error) {
+        console.error("Error creating user:", error);
+        return res.status(500).json({ message: "Internal server error" });
       }
-
-      const user = await prisma.user.findUnique({
-        where: { email },
-      });
-
-      if (user) {
-        return res
-          .status(400)
-          .json({ error: "User already exists with that email" });
-      }
-
-      const hashedPassword = await hash(password, 10);
-      const newUser = await prisma.user.create({
-        data: {
-          name,
-          email,
-          password: hashedPassword,
-          avatar: imageUrl,
-        },
-      });
-
-      res.status(201).json(newUser);
     });
   } else {
     return res.status(405).json({ error: "Method not allowed" });

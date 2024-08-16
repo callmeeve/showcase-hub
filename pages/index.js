@@ -53,27 +53,6 @@ export default function Home() {
     // The filtering logic is handled by the useEffect hook
   };
 
-  if (error) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <p className="text-red-500">Error: {error}</p>
-      </div>
-    );
-  }
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <InfinitySpin
-          visible={true}
-          width="200"
-          color="#06b6d4"
-          ariaLabel="infinity-spin-loading"
-        />
-      </div>
-    );
-  }
-
   return (
     <div className="flex flex-col min-h-[100dvh]">
       <Navbar />
@@ -141,6 +120,11 @@ export default function Home() {
             {filteredProjects.length === 0 && !loading && (
               <div className="flex items-center justify-center col-span-3">
                 <p className="text-gray-600">No projects found</p>
+              </div>
+            )}
+            {loading && (
+              <div className="flex items-center justify-center col-span-3">
+                <InfinitySpin color="#2563EB" />
               </div>
             )}
             {filteredProjects.map((project) => (

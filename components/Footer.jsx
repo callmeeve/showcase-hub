@@ -3,19 +3,19 @@ import React from 'react'
 export default function Footer() {
     const footerNavs = [
         {
-            href: 'javascript:void()',
+            href: '/terms',
             name: 'Terms'
         },
         {
-            href: 'javascript:void()',
+            href: '/license',
             name: 'License'
         },
         {
-            href: 'javascript:void()',
+            href: '/privacy',
             name: 'Privacy'
         },
         {
-            href: 'javascript:void()',
+            href: '/about',
             name: 'About us'
         }
     ]

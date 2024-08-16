@@ -9,8 +9,7 @@ export default function Navbar() {
 
     const [open, setOpen] = useState(false);
     const router = useRouter();
-
-    // Replace javascript:void(0) paths with your paths
+    
     const navigation = [
         { title: 'Home', path: '/' },
         { title: 'About', path: '/about' },
