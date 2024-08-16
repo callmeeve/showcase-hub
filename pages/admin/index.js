@@ -15,9 +15,6 @@ const Admin = () => {
     const fetchProjects = async () => {
       try {
         const res = await fetch("/api/projects");
-        if (!res.ok) {
-          throw new Error(`Failed to fetch projects: ${res.statusText}`);
-        }
         const data = await res.json();
         setProjects(data);
       } catch (err) {
@@ -40,13 +37,10 @@ const Admin = () => {
     formData.append("url", newProject.url);
 
     try {
-      const res = await fetch(process.env.NEXT_PUBLIC_API_URL + "/projects", {
+      const res = await fetch("/api/projects", {
         method: "POST",
         body: formData,
       });
-      if (!res.ok) {
-        throw new Error(`Failed to create project: ${res.statusText}`);
-      }
       const createdProject = await res.json();
       setProjects([...projects, createdProject]);
     } catch (err) {

@@ -1,7 +1,8 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { compare } from "bcryptjs";
-import prisma from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
+// import { PrismaAdapter } from "@next-auth/prisma-adapter";
 
 export default NextAuth({
   // debug: true,
@@ -33,6 +34,7 @@ export default NextAuth({
   jwt: {
     secret: process.env.JWT_SECRET,
   },
+  // adapter: PrismaAdapter(prisma),
   secret: process.env.NEXTAUTH_SECRET, // Ensure this is correctly set
   callbacks: {
     async jwt({ token, user }) {

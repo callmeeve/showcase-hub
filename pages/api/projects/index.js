@@ -1,6 +1,6 @@
 // pages/api/projects/index.js
 import { getSession } from "next-auth/react";
-import prisma from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 import multer from "multer";
 import cloudinary from "@/lib/cloudinary";
 import streamifier from "streamifier";
@@ -26,15 +26,10 @@ export default async function handler(req, res) {
     case "GET":
       try {
         const projects = await prisma.project.findMany({
-          where: session
-            ? { userId: session.user.id }
-            : undefined, // No filter for non-logged-in users
+          where: session ? { userId: session.user.id } : undefined, // No filter for non-logged-in users
           include: {
             user: {
-              select: {
-                email: true,
-                name: true,
-              },
+              select: { email: true, name: true },
             },
           },
         });
@@ -61,6 +56,9 @@ export default async function handler(req, res) {
 
         const { name, description, url } = req.body;
 
+        console.log("Request body:", req.body);
+        console.log("Session:", session);
+
         if (!name || !url) {
           return res.status(400).json({ message: "Name and URL are required" });
         }
@@ -70,18 +68,21 @@ export default async function handler(req, res) {
           try {
             const streamUpload = (req) => {
               return new Promise((resolve, reject) => {
-                const stream = cloudinary.uploader.upload_stream((error, result) => {
-                  if (result) {
-                    resolve(result);
-                  } else {
-                    reject(error);
+                const stream = cloudinary.uploader.upload_stream(
+                  (error, result) => {
+                    if (result) {
+                      resolve(result);
+                    } else {
+                      reject(error);
+                    }
                   }
-                });
+                );
                 streamifier.createReadStream(req.file.buffer).pipe(stream);
               });
             };
             const result = await streamUpload(req);
             imageUrl = result.secure_url;
+            console.log("Image uploaded to Cloudinary:", result);
           } catch (error) {
             console.error("Error uploading to Cloudinary:", error);
             return res.status(500).json({ message: "Error uploading image" });
@@ -89,15 +90,19 @@ export default async function handler(req, res) {
         }
 
         try {
+          const projectData = {
+            name,
+            description,
+            url,
+            userId: session.user.id,
+            image: imageUrl,
+          };
+          console.log("Data to be inserted:", projectData);
+
           const project = await prisma.project.create({
-            data: {
-              name,
-              description,
-              url,
-              userId: session.user.id,
-              image: imageUrl,
-            },
+            data: projectData,
           });
+          console.log("Project created:", project);
           res.status(201).json(project);
         } catch (error) {
           console.error("Error creating project:", error);

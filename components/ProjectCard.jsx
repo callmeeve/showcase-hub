@@ -38,10 +38,10 @@ export default function ProjectCard({project}) {
                                 src="/user.jpg"
                                 width={32}
                                 height={32}
-                                alt={project.user.name}
+                                alt={project.user?.name}
                                 className="rounded-full"
                             />
-                            <p className="text-gray-900 font-medium text-sm">{project.user.name}</p>
+                            <p className="text-gray-900 font-medium text-sm">{project.user?.name}</p>
                         </div>
                         <Link legacyBehavior href={project.url}>
                             <a className="px-4 py-2.5 text-base bg-white text-cyan-500 border border-cyan-500 rounded hover:bg-cyan-500 hover:text-white sm:text-sm sm:leading-5">
