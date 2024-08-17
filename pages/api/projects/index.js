@@ -29,7 +29,7 @@ export default async function handler(req, res) {
           where: session ? { userId: session.user.id } : undefined, // No filter for non-logged-in users
           include: {
             user: {
-              select: { email: true, name: true },
+              select: { email: true, name: true, avatar: true },
             },
           },
         });

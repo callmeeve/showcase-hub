@@ -224,6 +224,7 @@ export default function Register() {
         onConfirm={handleDialogConfirm}
         title="Registration Successful"
         message="Your account has been created successfully. Please sign in to continue."
+        submit="Got it 🚀"
       />
     </div>
   );

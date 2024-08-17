@@ -124,7 +124,7 @@ export default function Home() {
             )}
             {loading && (
               <div className="flex items-center justify-center col-span-3">
-                <InfinitySpin color="#06b6d4" size={50} />
+                <InfinitySpin visible={true} width="50" color="#06b6d4" />
               </div>
             )}
             {filteredProjects.map((project) => (

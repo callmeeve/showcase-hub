@@ -35,7 +35,7 @@ export default function ProjectCard({project}) {
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                             <Image
-                                src="/user.jpg"
+                                src={project.user?.avatar}
                                 width={32}
                                 height={32}
                                 alt={project.user?.name}

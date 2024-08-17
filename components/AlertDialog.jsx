@@ -1,6 +1,6 @@
 import { Dialog, DialogPanel, DialogTitle, Button } from '@headlessui/react';
 
-export default function AlertDialog({ isOpen, onClose, onConfirm, title, message }) {
+export default function AlertDialog({ isOpen, onClose, onConfirm, title, message, submit }) {
     return (
         <Dialog open={isOpen} as="div" className="relative z-10 focus:outline-none" onClose={onClose}>
             {/* The backdrop, rendered as a fixed sibling to the panel container */}
@@ -22,7 +22,7 @@ export default function AlertDialog({ isOpen, onClose, onConfirm, title, message
                                 className="inline-flex items-center gap-2 rounded-md border border-transparent bg-cyan-600 text-white px-4 py-2 text-sm/6 font-medium hover:bg-cyan-700 focus:outline-none focus:ring focus:ring-cyan-500"
                                 onClick={onConfirm}
                             >
-                                Got it, thanks!
+                                {submit}
                             </Button>
                         </div>
                     </DialogPanel>

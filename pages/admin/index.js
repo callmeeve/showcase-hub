@@ -1,14 +1,17 @@
 import AdminLayout from "@/components/AdminLayout";
-import ProjectCard from "@/components/ProjectCard";
 import ProjectDialogForm from "@/components/ProjectDialogForm";
+import Image from "next/image";
 import { useState, useEffect } from "react";
 import { InfinitySpin } from "react-loader-spinner";
+import AlertDialog from "@/components/AlertDialog";
 
-const Admin = () => {
+const DashboardPage = () => {
   const [projects, setProjects] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [projectToDelete, setProjectToDelete] = useState(null);
 
   const close = () => setIsOpen(false);
 
@@ -50,6 +53,29 @@ const Admin = () => {
     }
   };
 
+  const handleDeleteProject = async (id) => {
+    try {
+      await fetch(`/api/projects/${id}`, { method: "DELETE" });
+      setProjects(projects.filter((project) => project.id !== id));
+    } catch (err) {
+      console.error("Error deleting project:", err); // Debugging error
+      setError(err.message);
+    }
+  };
+
+  const openDeleteDialog = (projectId) => {
+    setProjectToDelete(projectId);
+    setIsDialogOpen(true);
+  };
+
+  const confirmDeleteProject = () => {
+    if (projectToDelete) {
+      handleDeleteProject(projectToDelete);
+      setProjectToDelete(null);
+    }
+    setIsDialogOpen(false);
+  };
+
   return (
     <AdminLayout>
       {loading ? (
@@ -87,9 +113,49 @@ const Admin = () => {
               </button>
             </div>
           </div>
-          <div className="mt-8 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 mt-4 sm:grid-cols-2 lg:grid-cols-3">
             {projects.map((project) => (
-              <ProjectCard key={project.id} project={project} />
+              <div
+                key={project.id}
+                className="p-4 bg-white shadow-sm rounded-lg overflow-hidden border border-gray-200"
+              >
+                <div className="relative h-48">
+                  <Image
+                    src={project.image}
+                    alt={project.name}
+                    layout="fill"
+                    objectFit="cover"
+                  />
+                </div>
+                <div className="mt-8">
+                  <h4 className="font-bold text-xl">{project.name}</h4>
+                  <p className="mt-2 text-gray-600">
+                    {project.description.slice(0, 100)}...
+                  </p>
+                  <div className="mt-5">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Image
+                          src={project.user.avatar}
+                          width={32}
+                          height={32}
+                          alt={project.user.name}
+                          className="rounded-full"
+                        />
+                        <p className="text-gray-900 font-medium text-sm">
+                          {project.user.name}
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => openDeleteDialog(project.id)}
+                        className="px-4 py-2 text-base bg-white text-red-500 border border-red-500 rounded hover:bg-red-500 hover:text-white sm:text-sm sm:leading-5"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
             ))}
           </div>
         </>
@@ -99,8 +165,16 @@ const Admin = () => {
         onClose={close}
         onSubmit={handleCreateProject}
       />
+      <AlertDialog
+        isOpen={isDialogOpen}
+        title="Delete Project"
+        message="Are you sure you want to delete this project?"
+        onClose={() => setIsDialogOpen(false)}
+        onConfirm={confirmDeleteProject}
+        submit="Delete"
+      />
     </AdminLayout>
   );
 };
 
-export default Admin;
+export default DashboardPage;

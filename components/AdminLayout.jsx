@@ -22,11 +22,19 @@ const AdminLayout = ({ children }) => {
         return () => clearTimeout(timer);
     }, []);
 
-
     if (!session) {
         return <p>Access denied</p>;
     }
 
+    const navAdmin = [
+        { name: "Dashboard", href: "/admin" },
+        { name: "Projects", href: "/admin/projects" },
+    ];
+
+    const menuItems = [
+        { name: "Profile", href: "/admin/profile" },
+        { name: "Sign out", onClick: () => signOut() },
+    ];
 
     return (
         <div className="flex h-screen bg-white">
@@ -40,17 +48,14 @@ const AdminLayout = ({ children }) => {
                         <h2 className="text-2xl font-semibold">ShowcaseHub</h2>
                     </div>
                     <nav className="flex-grow">
-                        <ul className="space-y-5">
-                            <li className={`font-medium text-sm ${router.pathname === "/admin" ? "text-cyan-500" : "text-gray-900 hover:text-cyan-500"}`}>
-                                <Link legacyBehavior href="/admin">
-                                    Dashboard
-                                </Link>
-                            </li>
-                            <li className={`font-medium text-sm ${router.pathname === "/admin/projects" ? "text-cyan-500" : "text-gray-900 hover:text-cyan-500"}`}>
-                                <Link legacyBehavior href="/admin/projects">
-                                    Projects
-                                </Link>
-                            </li>
+                        <ul className="space-y-4">
+                            {navAdmin.map((item) => (
+                                <li key={item.href} className={`block p-2 font-medium text-sm rounded ${router.pathname === item.href ? "bg-cyan-500 text-white" : "text-gray-900 hover:bg-cyan-500 hover:text-white"}`}>
+                                    <Link legacyBehavior href={item.href}>
+                                        {item.name}
+                                    </Link>
+                                </li>
+                            ))}
                         </ul>
                     </nav>
                 </div>
@@ -79,27 +84,32 @@ const AdminLayout = ({ children }) => {
                                 <ChevronDownIcon className="h-3 w-3 text-gray-900" />
                             </MenuButton>
                             <MenuItems className="absolute right-0 w-48 mt-2 origin-top-right bg-white divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                                <MenuItem>
-                                    {({ isActive }) => (
-                                        <>
-                                            <Link legacyBehavior href="/admin/profile">
-                                                <a
-                                                    className={`${isActive ? 'bg-cyan-500 text-white' : 'hover:bg-cyan-500 hover:text-white'
-                                                        } group flex items-center w-full px-2 py-2 text-sm`}
-                                                >
-                                                    Profile
-                                                </a>
-                                            </Link>
-                                            <button
-                                                className={`${isActive ? 'bg-cyan-500 text-white' : 'hover:bg-cyan-500 hover:text-white'
-                                                    } group flex items-center w-full px-2 py-2 text-sm`}
-                                                onClick={() => signOut()}
-                                            >
-                                                Sign out
-                                            </button>
-                                        </>
-                                    )}
-                                </MenuItem>
+                                {menuItems.map((item, index) => (
+                                    <MenuItem key={index}>
+                                        {({ isActive }) => (
+                                            <>
+                                                {item.href && (
+                                                    <Link legacyBehavior href={item.href}>
+                                                        <a
+                                                            className={`${router.pathname === item.href ? 'text-cyan-500' : 'hover:text-cyan-500'
+                                                                } group flex items-center w-full px-2 py-2 text-sm`}
+                                                        >
+                                                            {item.name}
+                                                        </a>
+                                                    </Link>
+                                                )}
+                                                {item.onClick && (
+                                                    <button
+                                                        className="group flex items-center w-full px-2 py-2 text-sm hover:text-cyan-500"
+                                                        onClick={item.onClick}
+                                                    >
+                                                        {item.name}
+                                                    </button>
+                                                )}
+                                            </>
+                                        )}
+                                    </MenuItem>
+                                ))}
                             </MenuItems>
                         </Menu>
                     </div>
