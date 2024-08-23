@@ -24,6 +24,7 @@ export default function Navbar() {
                     <Link href="/" className="flex items-center">
                         <Image
                             src="/logo.png"
+                            priority
                             width={60}
                             height={60}
                             alt="Logo"

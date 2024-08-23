@@ -6,6 +6,7 @@ import { InfinitySpin } from "react-loader-spinner";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ProjectCard from "@/components/ProjectCard";
+import axios from "axios";
 
 export default function Home() {
   const [projects, setProjects] = useState([]);
@@ -17,13 +18,9 @@ export default function Home() {
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const res = await fetch("/api/projects");
-        if (!res.ok) {
-          throw new Error(`Failed to fetch projects: ${res.statusText}`);
-        }
-        const data = await res.json();
-        setProjects(data);
-        setFilteredProjects(data); // Initialize filtered projects
+        const res = await axios.get("/api/projects");
+        setProjects(res.data);
+        setFilteredProjects(res.data); // Initialize filtered projects
       } catch (err) {
         console.log("Error fetching projects:", err); // Debugging error
         console.error("Error fetching projects:", err); // Debugging error

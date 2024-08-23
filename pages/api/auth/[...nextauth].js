@@ -9,18 +9,30 @@ export default NextAuth({
   providers: [
     CredentialsProvider({
       async authorize(credentials) {
-        // Debugging log to check prisma instance inside authorize
-        const user = await prisma.user.findUnique({
-          where: {
-            email: credentials.email,
-          }
-        });
+        if (!credentials.email || !credentials.password) {
+          throw new Error("Email and password are required");
+        }
 
-        if (user && (await compare(credentials.password, user.password))) {
-          return { id: user.id, email: user.email, name: user.name, avatar: user.avatar };
-        } else {
-          // return null if user not found or password is wrong
-          return null;
+        try {
+          const user = await prisma.user.findUnique({
+            where: {
+              email: credentials.email,
+            },
+          });
+
+          if (user && (await compare(credentials.password, user.password))) {
+            return {
+              id: user.id,
+              email: user.email,
+              name: user.name,
+              avatar: user.avatar,
+            };
+          } else {
+            throw new Error("Invalid email or password");
+          }
+        } catch (error) {
+          console.error("Error during authorization:", error);
+          throw new Error("Authorization failed");
         }
       },
     }),

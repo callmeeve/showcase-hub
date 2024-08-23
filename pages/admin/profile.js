@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import Image from "next/image";
 import AdminLayout from "@/components/AdminLayout";
 import { InfinitySpin } from "react-loader-spinner";
+import axios from "axios";
 
 const ProfilePage = () => {
     const [loading, setLoading] = useState(true);
@@ -19,16 +20,18 @@ const ProfilePage = () => {
         if (!session) {
             router.push("/login");
         } else {
-            fetch(`/api/users/${session.user.id}`)
-                .then((res) => res.json())
-                .then((data) => {
-                    setUser(data);
-                    setLoading(false);
-                })
-                .catch((error) => {
+            const fetchUserData = async () => {
+                try {
+                    const res = await axios.get(`/api/users/${session.user.id}`);
+                    setUser(res.data);
+                } catch (error) {
                     setError(error.message);
+                } finally {
                     setLoading(false);
-                });
+                }
+            };
+
+            fetchUserData();
         }
     }, [loadingSession, session, router]);
 

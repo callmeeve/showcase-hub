@@ -11,10 +11,9 @@ import Image from "next/image";
 const AdminLayout = ({ children }) => {
     const [isOpen, setIsOpen] = useState(true);
     const [loading, setLoading] = useState(true);
+    
     const router = useRouter();
-    const { data: session } = useSession();
-
-    const avatarSrc = session.user.avatar ? session.user.avatar : "/user.jpg";
+    const { data: session, status } = useSession();
 
     useEffect(() => {
         // Simulate a loading delay
@@ -22,19 +21,49 @@ const AdminLayout = ({ children }) => {
         return () => clearTimeout(timer);
     }, []);
 
+    useEffect(() => {
+        const handleWindowResize = () => {
+            if (window.innerWidth < 768) {
+                setIsOpen(false);
+            } else {
+                setIsOpen(true);
+            }
+        };
+        window.addEventListener("resize", handleWindowResize);
+        return () => window.removeEventListener("resize", handleWindowResize);
+    }, []);
+        
+
+    if (status === "loading" || loading) {
+        return (
+            <div className="flex items-center justify-center min-h-screen">
+                <InfinitySpin
+                    size="200"
+                    color="#06b6d4"
+                    ariaLabel="three-dots-loading"
+                    wrapperStyle={{}}
+                    wrapperClass=""
+                    visible={true}
+                />
+            </div>
+        );
+    }
+
     if (!session) {
         return <p>Access denied</p>;
     }
 
     const navAdmin = [
         { name: "Dashboard", href: "/admin" },
-        { name: "Projects", href: "/admin/projects" },
+        { name: "Blog", href: "/admin/blog" },
     ];
 
     const menuItems = [
         { name: "Profile", href: "/admin/profile" },
         { name: "Sign out", onClick: () => signOut() },
     ];
+
+    const avatarSrc = session.user.avatar ? session.user.avatar : "/user.jpg";
 
     return (
         <div className="flex h-screen bg-white">
@@ -52,7 +81,7 @@ const AdminLayout = ({ children }) => {
                             {navAdmin.map((item) => (
                                 <li key={item.href} className={`block p-2 font-medium text-sm rounded ${router.pathname === item.href ? "bg-cyan-500 text-white" : "text-gray-900 hover:bg-cyan-500 hover:text-white"}`}>
                                     <Link legacyBehavior href={item.href}>
-                                        {item.name}
+                                        <a>{item.name}</a>
                                     </Link>
                                 </li>
                             ))}
@@ -78,6 +107,7 @@ const AdminLayout = ({ children }) => {
                                     src={avatarSrc}
                                     width={40}
                                     height={40}
+                                    priority
                                     alt={session.user.name}
                                     className="rounded-full object-cover"
                                 />
@@ -86,19 +116,18 @@ const AdminLayout = ({ children }) => {
                             <MenuItems className="absolute right-0 w-48 mt-2 origin-top-right bg-white divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                                 {menuItems.map((item, index) => (
                                     <MenuItem key={index}>
-                                        {({ isActive }) => (
+                                        {({ active }) => (
                                             <>
-                                                {item.href && (
+                                                {item.href ? (
                                                     <Link legacyBehavior href={item.href}>
                                                         <a
-                                                            className={`${router.pathname === item.href ? 'text-cyan-500' : 'hover:text-cyan-500'
+                                                            className={`${active ? 'text-cyan-500' : 'hover:text-cyan-500'
                                                                 } group flex items-center w-full px-2 py-2 text-sm`}
                                                         >
                                                             {item.name}
                                                         </a>
                                                     </Link>
-                                                )}
-                                                {item.onClick && (
+                                                ) : (
                                                     <button
                                                         className="group flex items-center w-full px-2 py-2 text-sm hover:text-cyan-500"
                                                         onClick={item.onClick}
@@ -114,24 +143,9 @@ const AdminLayout = ({ children }) => {
                         </Menu>
                     </div>
                 </header>
-                {loading ? (
-                    <div className="flex items-center justify-center min-h-screen">
-                        <InfinitySpin
-                            height="80"
-                            width="80"
-                            radius="9"
-                            color="#06b6d4"
-                            ariaLabel="three-dots-loading"
-                            wrapperStyle={{}}
-                            wrapperClass=""
-                            visible={true}
-                        />
-                    </div>
-                ) : (
-                    <main className="p-12 overflow-y-auto">
-                        {children}
-                    </main>
-                )}
+                <main className="p-12 overflow-y-auto">
+                    {children}
+                </main>
             </div>
         </div>
     );

@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import { InfinitySpin } from "react-loader-spinner";
 import AlertDialog from "@/components/AlertDialog";
+import axios from "axios";
 
 const DashboardPage = () => {
   const [projects, setProjects] = useState([]);
@@ -18,9 +19,8 @@ const DashboardPage = () => {
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const res = await fetch("/api/projects");
-        const data = await res.json();
-        setProjects(data);
+        const res = await axios.get("/api/projects");
+        setProjects(res.data);
       } catch (err) {
         console.log("Error fetching projects:", err); // Debugging error
         console.error("Error fetching projects:", err); // Debugging error
@@ -41,25 +41,29 @@ const DashboardPage = () => {
     formData.append("url", newProject.url);
 
     try {
-      const res = await fetch("/api/projects", {
-        method: "POST",
-        body: formData,
-      });
-      const createdProject = await res.json();
-      setProjects([...projects, createdProject]);
+      const res = await axios.post("/api/projects", formData);
+      setProjects([...projects, res.data]);
+
+      // Reset form
+      close();
     } catch (err) {
       console.error("Error creating project:", err); // Debugging error
       setError(err.message);
+    } finally {
+      setLoading(false);
+      setIsOpen(false);
     }
   };
 
   const handleDeleteProject = async (id) => {
     try {
-      await fetch(`/api/projects/${id}`, { method: "DELETE" });
+      await axios.delete(`/api/projects/${id}`);
       setProjects(projects.filter((project) => project.id !== id));
     } catch (err) {
       console.error("Error deleting project:", err); // Debugging error
       setError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -123,6 +127,7 @@ const DashboardPage = () => {
                   <Image
                     src={project.image}
                     alt={project.name}
+                    priority
                     layout="fill"
                     objectFit="cover"
                   />
@@ -136,14 +141,15 @@ const DashboardPage = () => {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <Image
-                          src={project.user.avatar}
+                          src={project.user?.avatar}
                           width={32}
                           height={32}
-                          alt={project.user.name}
+                          priority
+                          alt={project.user?.name}
                           className="rounded-full"
                         />
                         <p className="text-gray-900 font-medium text-sm">
-                          {project.user.name}
+                          {project.user?.name}
                         </p>
                       </div>
                       <button

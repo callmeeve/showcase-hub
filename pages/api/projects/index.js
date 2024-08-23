@@ -28,9 +28,7 @@ export default async function handler(req, res) {
         const projects = await prisma.project.findMany({
           where: session ? { userId: session.user.id } : undefined, // No filter for non-logged-in users
           include: {
-            user: {
-              select: { email: true, name: true, avatar: true },
-            },
+            user: true,
           },
         });
         res.status(200).json(projects);

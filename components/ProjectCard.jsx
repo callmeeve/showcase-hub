@@ -14,6 +14,7 @@ export default function ProjectCard({project}) {
                 <Image
                     src={project.image}
                     alt={project.name}
+                    priority
                     layout="fill"
                     objectFit="cover"
                 />
